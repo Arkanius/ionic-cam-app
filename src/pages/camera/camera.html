@@ -9,5 +9,8 @@
 
 
 <ion-content padding>
-	<h1>Camera</h1>
+	<h3>Camera</h3>
+	<button ion-button (click)="choosePhoto()">Foto</button>
+	<img src="{{myPhoto}}">
+	<button ion-button (click)="saveImage()">Salvar</button>
 </ion-content>

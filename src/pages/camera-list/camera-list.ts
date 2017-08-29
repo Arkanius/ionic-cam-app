@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 
 /**
  * Generated class for the CameraListPage page.
@@ -17,8 +18,27 @@ export class CameraListPage {
 
 	photos: any[] = []
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
-  }
+  constructor(
+	public navCtrl: NavController, 
+	public navParams: NavParams,
+	private sqlite: SQLite
+	) {}
+
+ngOnInit() {
+	this.sqlite.create({
+		name: 'data.db',
+		location: 'default'
+	})
+	.then((db: SQLiteObject) => {
+		return db.executeSql('select * from photos', {})
+	})
+	.then((result) => {
+		for (let i=0; i< result.rows.length; i++) {
+			this.photos.push(result.rows.item(i));
+		}
+	})
+	.catch(e => console.log(e))
+}
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad CameraListPage');

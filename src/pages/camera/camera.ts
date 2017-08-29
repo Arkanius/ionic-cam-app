@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { NavController, NavParams, ActionSheetController, Platform } from 'ionic-angular';
 import {Camera, CameraOptions} from '@ionic-native/camera';
 import { FilePath } from '@ionic-native/file-path';
+import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
+import { CameraListPage } from '../camera-list/camera-list';
 
 /**
  * Generated class for the CameraPage page.
@@ -24,8 +26,22 @@ export class CameraPage {
 	private actionSheet: ActionSheetController,
 	private camera: Camera,
 	private filePath: FilePath,
-	private platform: Platform
+	private platform: Platform,
+	private sqlite: SQLite
 	) {}
+
+ngOnInit() {
+	this.sqlite.create({
+		name: 'data.db',
+		location: 'default'
+	})
+	.then((db: SQLiteObject) => {
+		db.executeSql('CREATE TABLE photos (url VARCHAR(250))', {})
+		.then(() => console.log('created'))
+		.catch(e => console.log(e))
+	})
+	.catch(e => console.log(e));
+}
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad CameraPage');
@@ -57,7 +73,17 @@ export class CameraPage {
   }
 
   saveImage() {
-
+	this.sqlite.create({
+		name: 'data.db',
+		location: 'default'
+	})
+	.then((db: SQLiteObject) => {
+		return db.executeSql('insert into photos (ur) values ("'+this.myPhoto+'")', {})
+	})
+	.then(() => {
+		this.navCtrl.push(CameraListPage)
+	})
+	.catch(e => console.log(e))
   }
 
 private takePhoto(source: number = 1, mediaType: number = 0) {
@@ -86,3 +112,4 @@ private takePhoto(source: number = 1, mediaType: number = 0) {
 }
 
 }
+	
